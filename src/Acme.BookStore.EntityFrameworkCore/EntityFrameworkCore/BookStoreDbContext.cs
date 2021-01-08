@@ -44,6 +44,7 @@ namespace Acme.BookStore.EntityFrameworkCore
                 b.ToTable(AbpIdentityDbProperties.DbTablePrefix + "Users"); //Sharing the same table "AbpUsers" with the IdentityUser
                 
                 b.ConfigureByConvention();
+
                 b.ConfigureAbpUser();
 
                 /* Configure mappings for your additional properties
@@ -54,6 +55,7 @@ namespace Acme.BookStore.EntityFrameworkCore
             /* Configure your own tables/entities inside the ConfigureBookStore method */
 
             builder.ConfigureBookStore();
+          
         }
     }
 }
