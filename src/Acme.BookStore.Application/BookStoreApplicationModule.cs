@@ -1,4 +1,7 @@
-﻿using Volo.Abp.Account;
+using Acme.BookStore.Permissions;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.DependencyInjection;
+using Volo.Abp.Account;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
@@ -25,6 +28,12 @@ namespace Acme.BookStore
             {
                 options.AddMaps<BookStoreApplicationModule>();
             });
-        }
+        Configure<RazorPagesOptions>(options =>
+         {
+           options.Conventions.AuthorizePage("/Books/Index", BookStorePermissions.Books.Default);
+           options.Conventions.AuthorizePage("/Books/CreateModal", BookStorePermissions.Books.Create);
+           options.Conventions.AuthorizePage("/Books/EditModal", BookStorePermissions.Books.Edit);
+         });
+    }
     }
 }

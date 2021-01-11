@@ -1,5 +1,7 @@
 $(function () {
   var l = abp.localization.getResource('BookStore');
+  var createModal = new abp.ModalManager(abp.appPath + 'Books/CreateModal');
+  var editModal = new abp.ModalManager(abp.appPath + 'Books/EditModal');
 
   var dataTable = $('#BooksTable').DataTable(
     abp.libs.datatables.normalizeConfiguration({
@@ -10,6 +12,40 @@ $(function () {
       scrollX: true,
       ajax: abp.libs.datatables.createAjax(acme.bookStore.book.getList),
       columnDefs: [
+        {
+          title: l('Actions'),
+          rowAction: {
+            items:
+              [
+                {
+                  text: l('Edit'),
+                  visible: abp.auth.isGranted('BookStore.Books.Edit'),
+                action: function (data) {
+                    editModal.open({ id: data.record.id });
+                  }
+                },
+                {
+                  text: l('Delete'), visible: abp.auth.isGranted('BookStore.Books.Delete'),
+                  confirmMessage: function (data) {
+                    return l(
+                      'BookDeletionConfirmationMessage',
+                      data.record.name
+                    );
+                  },
+                  action: function (data) {
+                    acme.bookStore.book
+                      .delete(data.record.id)
+                      .then(function () {
+                        abp.notify.info(
+                          l('SuccessfullyDeleted')
+                        );
+                        dataTable.ajax.reload();
+                      });
+                  }
+                }
+              ]
+          }
+        },
         {
           title: l('Name'),
           data: "name"
@@ -49,4 +85,17 @@ $(function () {
       ]
     })
   );
+
+  createModal.onResult(function () {
+    dataTable.ajax.reload();
+  });
+
+  editModal.onResult(function () {
+    dataTable.ajax.reload();
+  });
+
+  $('#NewBookButton').click(function (e) {
+    e.preventDefault();
+    createModal.open();
+  });
 });
